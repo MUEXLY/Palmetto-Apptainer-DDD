@@ -1,0 +1,78 @@
+cmake_minimum_required(VERSION 3.1.0)
+project(DDqt VERSION 1.0.0 LANGUAGES CXX)
+
+list(APPEND CMAKE_PREFIX_PATH "/Users/Giacomo/Applications/Qt/6.5.2/macos/lib/cmake")
+
+set(EIGEN3_INCLUDE_DIRS /usr/include/eigen3)
+set(BOOST_INCLUDE_DIRS /usr/include/boost)
+set(MoDELibRootDir "${CMAKE_CURRENT_SOURCE_DIR}/../../")
+set(CMAKE_CXX_FLAGS "-Wall -Wextra -march=native -Ofast")
+set(CMAKE_BUILD_TYPE Release)
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTORCC ON)
+set(CMAKE_AUTOUIC ON)
+
+
+### fftw3 ### find_package is currently broken. Workaround using find_library
+find_library(FFTW3_LIBRARIES fftw3)  
+if(FFTW3_LIBRARIES)
+	cmake_path(GET FFTW3_LIBRARIES PARENT_PATH FFTW3_LIBRARY_DIRS)
+	set(FFTW3_INCLUDE_DIRS ${FFTW3_LIBRARY_DIRS}/../include)
+	message(STATUS "FFTW3_LIBRARIES:" ${FFTW3_LIBRARIES})
+	message(STATUS "FFTW3_LIBRARY_DIRS:" ${FFTW3_LIBRARY_DIRS})
+	message(STATUS "FFTW3_INCLUDE_DIRS:" ${FFTW3_INCLUDE_DIRS})
+	include_directories(${FFTW3_INCLUDE_DIRS})
+	include_directories(${BOOST_INCLUDE_DIRS})
+	add_definitions(-D _MODEL_GLIDE_PLANE_NOISE_GENERATOR_)
+else()
+  	message(WARNING "library ${FFTW3_LIBRARIES} not found, noise generator is disabled")
+endif()
+
+### Qt ###
+find_package(Qt6 COMPONENTS Widgets OpenGL REQUIRED)
+message (STATUS "Qt6_VERSION: ${Qt6_VERSION}")
+if (NOT Qt6_FOUND)
+  message("Skipping DDvtk: ${Qt6_NOT_FOUND_MESSAGE}")
+  return()
+endif()
+
+### VTK ###
+find_package(VTK REQUIRED)
+message (STATUS "VTK_VERSION: ${VTK_VERSION}")
+if (NOT VTK_FOUND)
+  message("Skipping DDvtk: ${VTK_NOT_FOUND_MESSAGE}")
+  return()
+endif()
+
+add_executable(${PROJECT_NAME} DDqt.cxx)
+
+include_directories ( ${EIGEN3_INCLUDE_DIRS} )
+include_directories(${MoDELibRootDir}/include/DislocationMobilities)
+include_directories(${MoDELibRootDir}/include/DislocationDynamicsIO)
+include_directories(${MoDELibRootDir}/include/Mesh/)
+include_directories(${MoDELibRootDir}/include/FEM/)
+include_directories(${MoDELibRootDir}/include/IO)
+include_directories(${MoDELibRootDir}/include/Utilities)
+include_directories(${MoDELibRootDir}/include/Math/)
+include_directories(${MoDELibRootDir}/include/Geometry/)
+include_directories(${MoDELibRootDir}/include/vtk/)
+include_directories(${MoDELibRootDir}/include/PolycrystallineMaterials/)
+include_directories(${MoDELibRootDir}/include/Lattices/)
+include_directories(${MoDELibRootDir}/include/GlidePlanes/)
+include_directories(${MoDELibRootDir}/include/DislocationDynamicsBase/)
+
+
+add_subdirectory(${MoDELibRootDir}/src/Geometry Geometry)
+add_subdirectory(${MoDELibRootDir}/src/Mesh Mesh)
+add_subdirectory(${MoDELibRootDir}/src/Lattices Lattices)
+add_subdirectory(${MoDELibRootDir}/src/DislocationDynamicsIO DDDIO)
+add_subdirectory(${MoDELibRootDir}/src/GlidePlanes GlidePlanes)
+add_subdirectory(${MoDELibRootDir}/src/DislocationMobilities DDDmobilities)
+add_subdirectory(${MoDELibRootDir}/src/PolycrystallineMaterials PolyMaterials)
+add_subdirectory(${MoDELibRootDir}/src/DislocationDynamicsBase DDDbase)
+add_subdirectory(${MoDELibRootDir}/src/vtk vtk)
+
+target_link_libraries(${PROJECT_NAME} ${VTK_LIBRARIES} Qt6::Widgets Qt6::OpenGL Qt6::Core ${FFTW3_LIBRARIES})
+vtk_module_autoinit(TARGETS DDqt MODULES ${VTK_LIBRARIES} )

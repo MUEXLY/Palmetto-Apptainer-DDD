@@ -1,0 +1,8 @@
+Bootstrap: docker
+From: archlinux:base-devel
+
+%files
+
+%post
+
+%runscript
