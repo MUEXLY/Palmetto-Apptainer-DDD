@@ -1,6 +1,8 @@
 # Compile Binaries
-    - When you compile the binaries for DDD simulation, you need to target specific CPU archtecture to avoid the illegal instruction runtime error.
-    - Check the CPU architecture of Palmetto cluster with `whatsfree` command
+
+- When you compile the binaries for DDD simulation, you need to target specific CPU archtecture to avoid the illegal instruction runtime error.
+- Check the CPU architecture of Palmetto cluster with `whatsfree` command
+
 
 ```
     TOTAL NODES: 427  TOTAL CORES: 32784  NODES FREE: 149  CORES FREE: 15748  NODES OFFLINE: 4  NODES RESERVED: 0

@@ -6,9 +6,9 @@
 #SBATCH --mem 32gb
 #SBATCH --time 02:00:00
 
-sandBoxName="archDDD"
+SANDBOXNAME="archDDD"
 
 # change the current working directory
 cd $SLURM_SUBMIT_DIR
 
-apptainer build --sandbox --fakeroot ${sandBoxName}.sandbox arch.def
+apptainer build --sandbox --fakeroot ${SANDBOXNAME}.sandbox ${SANDBOXNAME}.def
